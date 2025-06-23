@@ -1,3 +1,5 @@
+/* eslint-disable no-constant-condition */
+/* eslint-disable no-useless-escape */
 /**
  * htmldiff.js is a library that compares HTML content. It creates a diff between two
  * HTML documents by combining the two documents and wrapping the differences with
@@ -324,6 +326,56 @@
     var iframe = /^<iframe.*src=['"]([^"']*)['"].*>/.exec(token);
     if (iframe) {
       return '<iframe src="' + iframe[1] + '"></iframe>';
+    }
+
+    // Handle jp-substep specifically to include componentUUID in the key.
+    // This allows atomic jp-substep tags to be uniquely identified if they have a UUID.
+    if (/^\s*<jp-substep/i.test(token)) {
+      // Check if the token starts with <jp-substep
+      var jpSubstepUuidMatch = /data-component-uuid=["']([^"']*)["']/i.exec(
+        token
+      );
+      if (jpSubstepUuidMatch && jpSubstepUuidMatch[1]) {
+        return '<jp-substep uuid="' + jpSubstepUuidMatch[1] + '">';
+      }
+      // If jp-substep doesn't have a UUID or the regex fails,
+      // it will fall through to the generic tagName logic below,
+      // which will key it as '<jp-substep>'.
+    }
+
+    // Handle jp-note specifically to include componentUUID in the key.
+    // This allows atomic jp-note tags to be uniquely identified if they have a UUID.
+    if (/^\s*<jp-note/i.test(token)) {
+      // Check if the token starts with <jp-note
+      var jpNoteUuidMatch = /data-component-uuid=["']([^"']*)["']/i.exec(token);
+      if (jpNoteUuidMatch && jpNoteUuidMatch[1]) {
+        return '<jp-note uuid="' + jpNoteUuidMatch[1] + '">';
+      }
+      // If jp-note doesn't have a UUID or the regex fails,
+      // it will fall through to the generic tagName logic below,
+      // which will key it as '<jp-note>'.
+    }
+
+    //jp-child
+    if (/^\s*<jp-child/i.test(token)) {
+      // Check if the token starts with <jp-child
+      var jpChildUuidMatch = /data-component-uuid=["']([^"']*)["']/i.exec(
+        token
+      );
+      if (jpChildUuidMatch && jpChildUuidMatch[1]) {
+        return '<jp-child uuid="' + jpChildUuidMatch[1] + '">';
+      }
+    }
+
+    //jp-table
+    if (/^\s*<jp-table/i.test(token)) {
+      // Check if the token starts with <jp-child
+      var jpTableUuidMatch = /data-component-uuid=["']([^"']*)["']/i.exec(
+        token
+      );
+      if (jpTableUuidMatch && jpTableUuidMatch[1]) {
+        return '<jp-table uuid="' + jpTableUuidMatch[1] + '">';
+      }
     }
 
     // If the token is any other element, just grab the tag name.
@@ -1099,7 +1151,7 @@
     });
   } else if (typeof module !== "undefined" && module !== null) {
     module.exports = diff;
-  } else {
-    this.htmldiff = diff;
+    } else {
+      this.htmldiff = diff;
   }
 }).call(this);
