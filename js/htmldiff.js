@@ -378,6 +378,17 @@
       }
     }
 
+    //jp-custom
+    if (/^\s*<jp-custom/i.test(token)) {
+      // Check if the token starts with <jp-custom
+      var jpCustomUuidMatch = /data-component-uuid=["']([^"']*)["']/i.exec(
+        token
+      );
+      if (jpCustomUuidMatch && jpCustomUuidMatch[1]) {
+        return '<jp-custom uuid="' + jpCustomUuidMatch[1] + '">';
+      }
+    }
+
     // If the token is any other element, just grab the tag name.
     var tagName = /<([^\s>]+)[\s>]/.exec(token);
     if (tagName) {
@@ -1151,7 +1162,7 @@
     });
   } else if (typeof module !== "undefined" && module !== null) {
     module.exports = diff;
-    } else {
-      this.htmldiff = diff;
+  } else {
+    this.htmldiff = diff;
   }
 }).call(this);
